@@ -18,8 +18,11 @@ public:
 
 		REG_METHOD_FUNPR(CLangManagerUI, void, ReloadLanguage, ());
 		r = engine->RegisterGlobalFunction("void SetLanguage(LPCTSTR lpstrPath, LPCTSTR lpstrname)", asFUNCTION(CLangManagerUI::SetLanguage), asCALL_CDECL); 		assert( r >= 0 ); 
-		r = engine->RegisterGlobalFunction("LPCTSTR GetString(int id, LPCTSTR defaultstring)", asFUNCTION(CLangManagerUI::GetString), asCALL_CDECL); 		assert( r >= 0 ); 
-		r = engine->RegisterGlobalFunction("LPCTSTR GetStringExtra(int id, LPCTSTR defaultstring)", asFUNCTION(CLangManagerUI::GetStringExtra), asCALL_CDECL); 		assert( r >= 0 ); 
+		
+		//高级用户可能用得上，象我这样的普通用户，估计用不上。注释了。
+		
+		//r = engine->RegisterGlobalFunction("LPCTSTR GetString(int id, LPCTSTR defaultstring)", asFUNCTION(CLangManagerUI::GetString), asCALL_CDECL); 		assert( r >= 0 );
+		//r = engine->RegisterGlobalFunction("LPCTSTR GetStringExtra(int id, LPCTSTR defaultstring)", asFUNCTION(CLangManagerUI::GetStringExtra), asCALL_CDECL); 		assert(r >= 0);
 	}
 };
 
