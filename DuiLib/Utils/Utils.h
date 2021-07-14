@@ -78,9 +78,9 @@ namespace DuiLib
 		void Inflate(int cx, int cy);
 		void Deflate(int cx, int cy);
 		void Union(CDuiRect& rc);
-		BOOL IntersectRect(const RECT &rect1, const RECT &rect2);
+		BOOL IntersectRect(const RECT& rect1, const RECT& rect2);
 		POINT CenterPoint() const;
-		void AlignRect(const RECT &rc, UINT uAlign = DT_CENTER|DT_VCENTER);
+		void AlignRect(const RECT& rc, UINT uAlign = DT_CENTER | DT_VCENTER);
 	};
 
 	/////////////////////////////////////////////////////////////////////////////////////
@@ -177,8 +177,8 @@ namespace DuiLib
 		const CDuiString& operator=(const TCHAR ch);
 		const CDuiString& operator=(LPCTSTR pstr);
 #ifdef _UNICODE
-		const CDuiString& CDuiString::operator=(LPCSTR lpStr);
-		const CDuiString& CDuiString::operator+=(LPCSTR lpStr);
+		const CDuiString& operator=(LPCSTR lpStr);
+		const CDuiString& operator+=(LPCSTR lpStr);
 #else
 		const CDuiString& CDuiString::operator=(LPCWSTR lpwStr);
 		const CDuiString& CDuiString::operator+=(LPCWSTR lpwStr);
@@ -221,6 +221,16 @@ namespace DuiLib
 		TCHAR m_szBuffer[MAX_LOCAL_STRING_LEN + 1];
 	};
 
+	//hao.chen 针对std::map时的比较
+	struct UILIB_API CDuiStringMapCompare
+	{
+	public:
+		bool operator() (const CDuiString* left, const CDuiString* right) const
+		{
+			return _tcscmp(left->GetData(), right->GetData()) < 0;
+		}
+	};
+
 	static std::vector<CDuiString> StrSplit(CDuiString text, CDuiString sp)
 	{
 		std::vector<CDuiString> vResults;
@@ -234,7 +244,7 @@ namespace DuiLib
 		}
 		vResults.push_back(text);
 		return vResults;
-}
+	}
 	/////////////////////////////////////////////////////////////////////////////////////
 	//
 
@@ -287,9 +297,9 @@ namespace DuiLib
 	class CDuiVariant : public VARIANT
 	{
 	public:
-		CDuiVariant() 
-		{ 
-			VariantInit(this); 
+		CDuiVariant()
+		{
+			VariantInit(this);
 		}
 		CDuiVariant(int i)
 		{
@@ -309,16 +319,16 @@ namespace DuiLib
 			this->vt = VT_BSTR;
 			this->bstrVal = s;
 		}
-		CDuiVariant(IDispatch *disp)
+		CDuiVariant(IDispatch* disp)
 		{
 			VariantInit(this);
 			this->vt = VT_DISPATCH;
 			this->pdispVal = disp;
 		}
 
-		~CDuiVariant() 
-		{ 
-			VariantClear(this); 
+		~CDuiVariant()
+		{
+			VariantClear(this);
 		}
 	};
 
@@ -336,7 +346,7 @@ namespace DuiLib
 				WideCharToMultiByte(CodePage, 0, lpszSrc, -1, pANSI, nANSILen, NULL, NULL);
 				return pANSI;
 			}
-		}	
+		}
 		return NULL;
 	}
 
@@ -349,7 +359,7 @@ namespace DuiLib
 			if (pUnicode != NULL)
 			{
 				ZeroMemory((void*)pUnicode, (nUnicodeLen + 1) * sizeof(WCHAR));
-				MultiByteToWideChar(CodePage, 0, lpszSrc,-1, pUnicode, nUnicodeLen);
+				MultiByteToWideChar(CodePage, 0, lpszSrc, -1, pUnicode, nUnicodeLen);
 				return pUnicode;
 			}
 		}
@@ -361,10 +371,10 @@ namespace DuiLib
 	class CDuiLock
 	{
 	public:
-		CDuiLock(){ InitializeCriticalSectionAndSpinCount(&m_lock, 5000); }
-		~CDuiLock(){ DeleteCriticalSection(&m_lock); }
-		void Lock(){ EnterCriticalSection(&m_lock); }
-		void Unlock(){ LeaveCriticalSection(&m_lock); }
+		CDuiLock() { InitializeCriticalSectionAndSpinCount(&m_lock, 5000); }
+		~CDuiLock() { DeleteCriticalSection(&m_lock); }
+		void Lock() { EnterCriticalSection(&m_lock); }
+		void Unlock() { LeaveCriticalSection(&m_lock); }
 	private:
 		CRITICAL_SECTION m_lock;
 	};
@@ -373,11 +383,11 @@ namespace DuiLib
 	class CDuiInnerLock
 	{
 	public:
-		CDuiInnerLock(CDuiLock *p) : ptr(p) { ptr->Lock(); }
-		~CDuiInnerLock(){ ptr->Unlock(); }
+		CDuiInnerLock(CDuiLock* p) : ptr(p) { ptr->Lock(); }
+		~CDuiInnerLock() { ptr->Unlock(); }
 	private:
-		CDuiLock *ptr;
-	};	
+		CDuiLock* ptr;
+	};
 
 	//通用控件内存池
 	template <class T>
@@ -385,8 +395,8 @@ namespace DuiLib
 	{
 		struct tagObject
 		{
-			tagObject *prev;
-			tagObject *next;
+			tagObject* prev;
+			tagObject* next;
 		};
 	public:
 		CStdControlPool()
@@ -410,39 +420,39 @@ namespace DuiLib
 
 		T* Alloc()
 		{
-			if(m_pFirstNode == NULL) MakePool();
-			if(m_pFirstNode == NULL) return NULL;
+			if (m_pFirstNode == NULL) MakePool();
+			if (m_pFirstNode == NULL) return NULL;
 
-			tagObject *p = m_pFirstNode;
+			tagObject* p = m_pFirstNode;
 			pop(p); //从池中取出来
-			T *tt = (T*)(p+1);
+			T* tt = (T*)(p + 1);
 			new (tt)T; //使用tt这个内存地址new T()
 			return tt;
 		}
 
-		void Free(T *t)
+		void Free(T* t)
 		{
 			t->~T();
 			memset(t, 0, sizeof(T));
-			tagObject *p = (tagObject *)t-1;
+			tagObject* p = (tagObject*)t - 1;
 			pushback(p); //放回池里
 			t = NULL;
 		}
 
 		//清理内存，如果调用这个函数之前，有内存没有归还，也会清理，对象变成野指针。
 		//要小心使用，可能导致无法判断运行时内存泄漏。
-		void ClearMemory() 
+		void ClearMemory()
 		{
 			//DWORD tk = GetTickCount();
 
-			for (int i=0; i<m_pListMemBlock.GetSize(); i++)
+			for (int i = 0; i < m_pListMemBlock.GetSize(); i++)
 			{
-				free( (void*)m_pListMemBlock[i] );
+				free((void*)m_pListMemBlock[i]);
 			}
 
-// 			CDuiString s;
-// 			s.Format(_T("%d"), GetTickCount() - tk);
-// 			MessageBox(NULL, s, _T("释放时间"), MB_OK);
+			// 			CDuiString s;
+			// 			s.Format(_T("%d"), GetTickCount() - tk);
+			// 			MessageBox(NULL, s, _T("释放时间"), MB_OK);
 		}
 
 	protected:
@@ -450,29 +460,29 @@ namespace DuiLib
 		{
 			//分配一个连续空间，因为如果每个object都new一次，new和delete都会耗费大量时间。
 			int tagSize = sizeof(tagObject) + sizeof(T);
-			BYTE *pBlock = (BYTE *)malloc(tagSize * _blockcountnext);
-			for (int i=0; i<_blockcountnext; i++)
+			BYTE* pBlock = (BYTE*)malloc(tagSize * _blockcountnext);
+			for (int i = 0; i < _blockcountnext; i++)
 			{
-				tagObject *p = new (pBlock + i*tagSize)tagObject;
+				tagObject* p = new (pBlock + i * tagSize)tagObject;
 				p->prev = NULL;
 				p->next = NULL;
 
-				T *tt = (T*)(p+1);
+				T* tt = (T*)(p + 1);
 				memset(tt, 0, sizeof(T));
 				pushback(p);
 			}
 			m_pListMemBlock.Add(pBlock);
 
 			//当下次分配内存时，不要简单粗暴的乘以2，设定一个上限
-			if(_blockcountnext < _nMaxMemoryPageSize)
+			if (_blockcountnext < _nMaxMemoryPageSize)
 				_blockcountnext *= 2;
-			if(_blockcountnext > _nMaxMemoryPageSize)
+			if (_blockcountnext > _nMaxMemoryPageSize)
 				_blockcountnext = _nMaxMemoryPageSize;
 		}
 
-		void pushback(tagObject *pBlock)
+		void pushback(tagObject* pBlock)
 		{
-			if(m_pFirstNode == NULL)	//无队列头
+			if (m_pFirstNode == NULL)	//无队列头
 			{
 				pBlock->prev = NULL;
 				pBlock->next = NULL;
@@ -488,20 +498,20 @@ namespace DuiLib
 			}
 		}
 
-		void pop(tagObject *pBlock)
+		void pop(tagObject* pBlock)
 		{
-			if(m_pFirstNode == m_pLastNode)
+			if (m_pFirstNode == m_pLastNode)
 			{
 				m_pFirstNode = NULL;
 				m_pLastNode = NULL;
 			}
-			else if(pBlock == m_pFirstNode)
+			else if (pBlock == m_pFirstNode)
 			{
 				m_pFirstNode = pBlock->next;
 				m_pFirstNode->prev = NULL;
 
 			}
-			else if(pBlock == m_pLastNode)
+			else if (pBlock == m_pLastNode)
 			{
 				m_pLastNode = pBlock->prev;
 				m_pLastNode->next = NULL;
@@ -514,8 +524,8 @@ namespace DuiLib
 		}
 
 	private:
-		tagObject *m_pFirstNode;
-		tagObject *m_pLastNode;
+		tagObject* m_pFirstNode;
+		tagObject* m_pLastNode;
 		int _blockcountnext;
 		int _nMaxMemoryPageSize;
 		CStdPtrArray m_pListMemBlock;

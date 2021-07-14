@@ -18,17 +18,25 @@ namespace DuiLib {
 
 		BOOL AddText(int resid, LPCTSTR lpstrText);
 		LPCTSTR GetText(int resid);
+		BOOL AddText(CDuiString resId, LPCTSTR lpstrText);
+		LPCTSTR GetText(CDuiString resid);
 
 		BOOL AddToolTip(int resid, LPCTSTR lpstrText);
 		LPCTSTR GetToolTip(int resid);
+		BOOL AddToolTip(CDuiString resid, LPCTSTR lpstrText);
+		LPCTSTR GetToolTip(CDuiString resid);
 
 		BOOL AddTipValue(int resid, LPCTSTR lpstrText);
 		LPCTSTR GetTipValue(int resid);
+		BOOL AddTipValue(CDuiString resid, LPCTSTR lpstrText);
+		LPCTSTR GetTipValue(CDuiString resid);
+
 	private:
 		CDuiString m_sSkinFile;
-		std::map<int, CDuiString *> m_mText;
-		std::map<int, CDuiString *> m_mToolTip;
-		std::map<int, CDuiString *> m_mTipValue;
+
+		std::map<CDuiString*, CDuiString*, CDuiStringMapCompare> m_mText;
+		std::map<CDuiString*, CDuiString*, CDuiStringMapCompare> m_mToolTip;
+		std::map<CDuiString*, CDuiString*, CDuiStringMapCompare> m_mTipValue;
 	private:
 	};
 
@@ -37,7 +45,7 @@ namespace DuiLib {
 	protected:
 		struct tagStringTable 
 		{
-			int id;
+			CDuiString id;
 			CDuiString text1;
 			CDuiString text2;
 		};
@@ -56,6 +64,8 @@ namespace DuiLib {
 		static void ReleaseStringTable();
 		static LPCTSTR GetString(int id, LPCTSTR defaultstring = NULL);
 		static LPCTSTR GetStringExtra(int id, LPCTSTR defaultstring = NULL);
+		static LPCTSTR GetString(CDuiString id, LPCTSTR defaultstring = NULL);
+		static LPCTSTR GetStringExtra(CDuiString id, LPCTSTR defaultstring = NULL);
 	protected:
 		void ResetPackage();
 		CLangPackageUI *_addPackage(LPCTSTR lpstrSkinFile);
@@ -67,7 +77,7 @@ namespace DuiLib {
 		CStdStringPtrMap m_mSkinFile;		//所有已加载的xml
 		static CDuiString s_sLangPath;
 		static CDuiString s_sLangName;
-		static std::map<int, tagStringTable *> m_mStringTable;
+		static std::map<CDuiString, tagStringTable *> m_mStringTable;
 	};
 
 } // namespace DuiLib

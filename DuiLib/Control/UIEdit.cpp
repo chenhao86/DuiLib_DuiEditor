@@ -626,9 +626,9 @@ namespace DuiLib
 			return CResourceManager::GetInstance()->GetText(m_sTipValue);
 
 		CLangPackageUI *pkg = GetLangPackage();
-		if(pkg && GetResourceID() > 0)
+		if(pkg && ! GetResourceIDEx().IsEmpty())
 		{
-			LPCTSTR s = pkg->GetTipValue(GetResourceID());
+			LPCTSTR s = pkg->GetTipValue(GetResourceIDEx());
 			if(s && *s!='\0') return s; 
 		}
 		return m_sTipValue;

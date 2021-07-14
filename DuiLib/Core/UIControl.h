@@ -48,6 +48,8 @@ namespace DuiLib {
 
 		virtual int  GetResourceID() const;			//add by liqs99
 		virtual void SetResourceID(int resid);		//add by liqs99
+		virtual CDuiString  GetResourceIDEx() const;		//add by hao.chen
+		virtual void SetResourceID(CDuiString resid);		//add by hao.chen
 		virtual CLangPackageUI *GetLangPackage();
 		virtual void SetSkinFile(LPCTSTR lpstrSkinFile);
 		virtual CDuiString GetSkinFile();
@@ -266,6 +268,7 @@ namespace DuiLib {
 
 		bool m_bResourceText;
 		int  m_nResourceID;
+		CDuiString m_strResourceId; //hao.chen
 		CDuiString m_sSkinFile;	//我来自哪个文件， add by liqs99
 
 		CDuiString m_sText;
